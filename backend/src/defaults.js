@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS = {
   social: { instagram: '', facebook: '', youtube: '', linkedin: '' },
   hero: {
     headline: 'Batteries for electric vehicles',
-    lead: 'LiFePO4 and NMC battery packs from 12 V to 72 V for e-bikes, e-rickshaws, scooters and solar storage, made to your voltage, capacity and size.',
+    lead: 'LiFePO4 and NMC battery packs from 12 V to 96 V for cars, bikes, scooters, e-rickshaws and solar storage, made to your voltage, capacity and size.',
     image: PHOTO.bank,
     imageAlt: 'A bank of yellow LiFePO4 cells joined by aluminium busbars',
   },
@@ -57,10 +57,10 @@ export const DEFAULT_SETTINGS = {
     image: PHOTO.terminal,
     imageAlt: 'Copper and aluminium terminals on LiFePO4 cells',
   },
-  footerLede: 'Lithium battery packs for electric vehicles and solar storage.',
+  footerLede: 'Lithium battery packs for electric cars, bikes, scooters, rickshaws and solar storage.',
   seo: {
     title: 'Aexto: lithium batteries for electric vehicles',
-    description: 'LiFePO4 and NMC battery packs for e-bikes, e-rickshaws, scooters and solar storage, made to your voltage and size.',
+    description: 'LiFePO4 and NMC battery packs for electric cars, bikes, scooters, e-rickshaws and solar storage, made to your voltage and size.',
   },
 };
 

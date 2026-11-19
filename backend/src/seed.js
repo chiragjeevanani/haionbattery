@@ -13,11 +13,12 @@ if (dbExists() && !force) {
 
 const cat = (slug, name, description, image, sortOrder) => ({ id: uid(), slug, name, description, image, sortOrder });
 const categories = [
-  cat('e-rickshaw-batteries', 'E-rickshaw batteries', 'LiFePO4 packs for passenger and cargo e-rickshaws, sized to the existing tray.', PHOTO.rickshaw, 1),
-  cat('e-bike-batteries', 'E-bike batteries', 'NMC and LiFePO4 packs for e-bikes and e-cycles, with a matching charger.', PHOTO.evPack, 2),
-  cat('scooter-batteries', 'Scooter and motorcycle batteries', 'High-discharge packs for electric two-wheelers, 48 V to 72 V.', PHOTO.terminal, 3),
-  cat('solar-inverter-batteries', 'Solar and inverter batteries', 'LiFePO4 storage for homes, shops and solar systems.', PHOTO.storage, 4),
-  cat('bms-and-parts', 'BMS and parts', 'Battery management boards, balancers and pack hardware.', PHOTO.bms, 5),
+  cat('car-batteries', 'Car batteries', 'LiFePO4 and NMC packs for electric cars and car conversions, built to the voltage your motor and controller need.', PHOTO.evPack, 1),
+  cat('scooter-batteries', 'Bike and scooter batteries', 'High-discharge packs for electric motorbikes and scooters, 48 V to 72 V.', PHOTO.terminal, 2),
+  cat('e-bike-batteries', 'E-bike batteries', 'NMC and LiFePO4 packs for e-bikes and e-cycles, with a matching charger.', PHOTO.bank, 3),
+  cat('e-rickshaw-batteries', 'E-rickshaw and loader batteries', 'LiFePO4 packs for passenger and cargo e-rickshaws and loaders, sized to the existing tray.', PHOTO.rickshaw, 4),
+  cat('solar-inverter-batteries', 'Solar and inverter batteries', 'LiFePO4 storage for homes, shops and solar systems.', PHOTO.storage, 5),
+  cat('bms-and-parts', 'BMS and parts', 'Battery management boards, balancers and pack hardware.', PHOTO.bms, 6),
 ];
 const c = slug => categories.find(x => x.slug === slug).id;
 
@@ -28,6 +29,18 @@ const prod = (slug, name, category, shortDescription, description, images, specs
 });
 
 const products = [
+  prod('nmc-96v-100ah-car-pack', 'NMC car battery pack', 'car-batteries',
+    'Energy-dense pack for electric cars and conversions.',
+    'An NMC pack for electric cars and car conversions. Cylindrical cells in a rigid case, with a BMS that reports cell voltages and temperature. Built to the voltage and the space of your vehicle.',
+    [PHOTO.evPack, PHOTO.terminal],
+    [{ label: 'Chemistry', value: 'NMC' }, { label: 'Nominal voltage', value: '96 V' }, { label: 'Capacity', value: '100 Ah' }, { label: 'Protection', value: 'Smart BMS' }, { label: 'Vehicle', value: 'Electric car, conversion' }],
+    { featured: true, sortOrder: 0 }),
+  prod('lifepo4-72v-120ah-car-pack', 'LiFePO4 car battery pack', 'car-batteries',
+    'Long-life pack for cars that charge every day.',
+    'A LiFePO4 pack for electric cars, taxis and conversions that charge every day. Prismatic cells on copper busbars with a BMS, built to your voltage and fit.',
+    [PHOTO.bank, PHOTO.evPack],
+    [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '72 V' }, { label: 'Capacity', value: '120 Ah' }, { label: 'Cell format', value: 'Prismatic' }, { label: 'Vehicle', value: 'Electric car, taxi' }],
+    { sortOrder: 0 }),
   prod('lifepo4-60v-30ah-e-rickshaw-pack', 'LiFePO4 e-rickshaw pack', 'e-rickshaw-batteries',
     'Drop-in pack for passenger e-rickshaws, with a smart BMS.',
     'A LiFePO4 pack for passenger e-rickshaws. It replaces a lead-acid set in the same tray, weighs a fraction of it and holds its capacity through daily deep cycles. The BMS protects against over-charge, over-discharge, short circuit and over-temperature.',
@@ -39,7 +52,7 @@ const products = [
     'A 48 V LiFePO4 pack for loaders and passenger e-rickshaws that run long shifts. Built from prismatic cells with copper busbars and a BMS rated for the controller current.',
     [PHOTO.bank, PHOTO.terminal],
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '48 V' }, { label: 'Capacity', value: '40 Ah' }, { label: 'Cell format', value: 'Prismatic' }, { label: 'Vehicle', value: 'E-rickshaw, loader' }],
-    { featured: true, sortOrder: 2 }),
+    { sortOrder: 2 }),
   prod('nmc-48v-24ah-e-bike-pack', 'NMC e-bike pack', 'e-bike-batteries',
     'A compact pack for e-bikes with a hub or mid-drive motor.',
     'An NMC pack for e-bikes and e-cycles. Cylindrical cells in a rigid case, a BMS with charge and discharge protection, and a connector matched to your controller.',
@@ -53,8 +66,8 @@ const products = [
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '51.2 V' }, { label: 'Capacity', value: '30 Ah' }, { label: 'Vehicle', value: 'E-bike, cargo cycle' }],
     { sortOrder: 4 }),
   prod('nmc-72v-30ah-scooter-pack', 'NMC scooter pack', 'scooter-batteries',
-    'High-discharge pack for electric scooters and motorcycles.',
-    'A high-discharge NMC pack for electric scooters and motorcycles. Sized for 72 V controllers, with a BMS rated for the peak current of the motor.',
+    'High-discharge pack for electric motorbikes and scooters.',
+    'A high-discharge NMC pack for electric motorbikes and scooters. Sized for 72 V controllers, with a BMS rated for the peak current of the motor.',
     [PHOTO.terminal, PHOTO.evPack],
     [{ label: 'Chemistry', value: 'NMC' }, { label: 'Nominal voltage', value: '72 V' }, { label: 'Capacity', value: '30 Ah' }, { label: 'Discharge', value: 'High-current BMS' }, { label: 'Vehicle', value: 'Scooter, motorcycle' }],
     { featured: true, sortOrder: 5 }),

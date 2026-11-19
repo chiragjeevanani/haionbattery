@@ -35,7 +35,7 @@ export default function Footer() {
             <div className="span-2 start-6 footer__col">
               <h3>Batteries</h3>
               <ul>
-                {categories.slice(0, 5).map(c => (
+                {categories.slice(0, 6).map(c => (
                   <li key={c.id}><Link to={`/products?category=${c.slug}`}>{c.name}</Link></li>
                 ))}
               </ul>

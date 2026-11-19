@@ -9,13 +9,14 @@ export const CHEM = {
 }
 
 export const VEHICLES = [
-  { id: 'rickshaw', label: 'E-rickshaw', v: 48, ah: 40, chem: 'lfp' },
+  { id: 'car', label: 'Car', v: 96, ah: 100, chem: 'nmc' },
+  { id: 'bike', label: 'Motorbike or scooter', v: 72, ah: 30, chem: 'nmc' },
   { id: 'ebike', label: 'E-bike', v: 48, ah: 15, chem: 'nmc' },
-  { id: 'scooter', label: 'Scooter', v: 72, ah: 30, chem: 'nmc' },
+  { id: 'rickshaw', label: 'E-rickshaw', v: 48, ah: 40, chem: 'lfp' },
   { id: 'solar', label: 'Solar storage', v: 51.2, ah: 100, chem: 'lfp' },
 ]
 
-export const VOLTS = [12, 24, 36, 48, 51.2, 60, 72]
+export const VOLTS = [12, 24, 36, 48, 51.2, 60, 72, 96]
 
 export function planPack({ v, ah, chem }) {
   const c = CHEM[chem]

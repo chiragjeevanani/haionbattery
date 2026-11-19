@@ -40,7 +40,7 @@ export default function Products() {
         <div className="wrap">
           <div className="section-head">
             <h1 id="products-h" className="page-title">{title}</h1>
-            <p>{active?.description || 'Battery packs for e-bikes, e-rickshaws, scooters and solar storage. Open one to ask for a price.'}</p>
+            <p>{active?.description || 'Battery packs for cars, bikes, scooters, e-rickshaws and solar storage. Open one to ask for a price.'}</p>
           </div>
 
           <div className="filters">

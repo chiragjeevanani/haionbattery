@@ -17,10 +17,10 @@ function Choice({ name, value, current, onChange, children }) {
 export default function PackBuilder() {
   const uid = useId()
   const { settings, whatsappTextUrl } = useSite()
-  const [vehicle, setVehicle] = useState('rickshaw')
-  const [chem, setChem] = useState('lfp')
-  const [v, setV] = useState(48)
-  const [ah, setAh] = useState(40)
+  const [vehicle, setVehicle] = useState('car')
+  const [chem, setChem] = useState('nmc')
+  const [v, setV] = useState(96)
+  const [ah, setAh] = useState(100)
 
   const pickVehicle = id => {
     const x = VEHICLES.find(i => i.id === id)
@@ -32,7 +32,7 @@ export default function PackBuilder() {
   const plan = planPack({ v, ah, chem })
   const vehicleLabel = VEHICLES.find(i => i.id === vehicle).label
 
-  const summary = `${plan.packV} V ${plan.packAh} Ah ${plan.chem.label} pack (${plan.s}S${plan.p}P, ${plan.kwh} kWh) for ${vehicleLabel.toLowerCase()}`
+  const summary = `${plan.packV} V ${plan.packAh} Ah ${plan.chem.label} pack (${plan.s}S${plan.p}P, ${plan.kwh} kWh). Vehicle: ${vehicleLabel}`
   const quote = `/custom?${new URLSearchParams({ vehicle: vehicleLabel, voltage: String(plan.packV), capacity: String(plan.packAh), chemistry: plan.chem.label })}`
   const whatsapp = whatsappTextUrl(`Hello ${settings.siteName}, I would like a quote for a ${summary}.`)
 
