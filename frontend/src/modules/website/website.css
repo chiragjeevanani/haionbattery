@@ -1,0 +1,90 @@
+/* Page CSS for the Aexto website. The system (tokens, grid, buttons, nav, tiles, rows, forms)
+   comes from /assets/system.css; only what is inside a visual and the kit lacks is written here. */
+
+.site-loading { min-height: 100svh; background: var(--bg); }
+
+/* The client's own logo, trimmed from the supplied file. */
+.nav__logo-img { display: block; height: 44px; width: auto; }
+.footer .nav__logo-img { height: 48px; }
+@media (max-width: 639px) { .nav__logo-img { height: 36px; } }
+
+/* Inner pages grow with their content instead of holding to one screen. */
+.section.flow {
+  height: auto;
+  min-height: calc(100svh - var(--nav-h, 72px));
+}
+main > .section.flow:first-child { padding-top: calc(var(--nav, 72px) + var(--s-8)); }
+@media (max-width: 639px) { main > .section.flow:first-child { padding-top: calc(var(--nav, 56px) + var(--s-6)); } }
+.section.flow + .section.flow { padding-top: var(--s-6); }
+
+.page-title { font-size: var(--t-h2); line-height: 1.1; }
+.page-title--product { font-size: var(--t-h3, 28px); line-height: 1.15; }
+.faq-q { font: 500 var(--t-lead)/1.4 var(--font-text); letter-spacing: 0; }
+
+/* Home: the category list beside its photograph */
+.range-dot { display: inline-block; width: 8px; height: 8px; margin-left: var(--s-2); border-radius: 50%; background: var(--action); vertical-align: middle; }
+#range .frame--photo { min-height: 320px; }
+#range .frame__img, #custom .frame__img, .chem-photo .frame__img { width: 100%; height: 100%; object-fit: cover; }
+
+#custom .rows { margin-bottom: var(--s-7); }
+
+/* Home: storage photograph across the wrap */
+.storage-frame { aspect-ratio: 21 / 8; width: 100%; border-radius: var(--r-lg); overflow: clip; }
+.storage-frame .frame__img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; }
+@media (max-width: 639px) { .storage-frame { aspect-ratio: 4 / 3; } }
+
+/* Home: LiFePO4 against NMC */
+.compare { width: 100%; border-collapse: collapse; margin-bottom: var(--s-6); font-size: var(--t-body); }
+.compare th, .compare td { text-align: left; padding: var(--s-4) var(--s-4) var(--s-4) 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.compare thead th { font-weight: 500; font-size: var(--t-lead); padding-top: 0; }
+.compare tbody th { font-weight: 400; color: var(--muted); width: 36%; }
+.compare td { width: 32%; }
+.chem-photo { aspect-ratio: 4 / 5; }
+.chem-photo .frame__img { object-position: 22% 50%; }
+
+/* Tiles without a photograph keep their frame */
+.tile__fallback { width: 64px; height: 64px; object-fit: contain; margin: auto; }
+.tile__media:has(.tile__fallback), .gallery__main:has(.tile__fallback) { display: grid; place-items: center; }
+.tile__media > img:not(.tile__fallback) { display: block; }
+
+/* Products */
+.filters { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-7); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.chip {
+  height: 44px; padding: 0 var(--s-4); border: 1px solid var(--line); border-radius: 999px; background: none;
+  font: 500 var(--t-small)/1 var(--font-text); color: var(--ink); cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.search { display: flex; gap: var(--s-2); }
+.search input {
+  height: 44px; width: min(320px, 60vw); padding: 0 var(--s-4); border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--bg); color: var(--ink); font: 400 var(--t-body)/1 var(--font-text);
+}
+.product-grid { row-gap: var(--s-7); }
+.empty { display: grid; gap: var(--s-5); padding-block: var(--s-7); }
+
+/* Product detail */
+.crumbs { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-6); font-size: var(--t-small); color: var(--muted); }
+.gallery { display: grid; gap: var(--s-3); }
+.gallery__main { aspect-ratio: 4 / 3; overflow: clip; border-radius: var(--r-lg); background: var(--surface); }
+.gallery__main .frame__img { width: 100%; height: 100%; object-fit: cover; }
+.gallery__thumbs { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.gallery__thumb {
+  width: 88px; height: 66px; padding: 0; overflow: clip; border: 2px solid transparent; border-radius: var(--r-sm);
+  background: var(--surface); cursor: pointer; transition: border-color 160ms ease;
+}
+.gallery__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery__thumb:hover { border-color: var(--line); }
+.gallery__thumb[aria-pressed="true"] { border-color: var(--ink); }
+.price s { font-size: var(--t-body); }
+
+/* Inner page photographs */
+.custom-photo { aspect-ratio: 16 / 10; overflow: clip; border-radius: var(--r-lg); }
+.about-photo { aspect-ratio: 4 / 5; overflow: clip; border-radius: var(--r-lg); }
+.custom-photo .frame__img, .about-photo .frame__img { width: 100%; height: 100%; object-fit: cover; }
+
+.form__status[data-sent] { color: var(--ink); font-weight: 500; }
+.field textarea { width: 100%; }
+body.nav-locked { overflow: hidden; }

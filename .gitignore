@@ -1,0 +1,19 @@
+# dependencies and build output
+node_modules/
+dist/
+
+# secrets and local data: never commit these
+.env
+.env.*
+!.env.example
+backend/data/
+backend/uploads/
+
+# local tooling, screenshots and checker state
+.agents/
+.claude/
+.taste-skill/
+frontend/shots/
+.tmp-test/
+*.log
+.vercel/

@@ -1,0 +1,36 @@
+# Render Blueprint for the Aexto API (backend folder).
+# New > Blueprint > pick this repo. Render reads this file and creates the service.
+services:
+  - type: web
+    name: aexto-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    # "free" keeps the cost at zero, but its disk is wiped on every deploy and restart,
+    # so products, settings, enquiries and uploaded pictures would reset.
+    # For real use choose "starter" and uncomment the disk block below.
+    plan: free
+    # disk:
+    #   name: aexto-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@aexto.com
+      # Generated once; read it in the Render dashboard (Environment tab), then change it in Admin > Account.
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      # With the Vercel proxy the browser never calls the API directly, so CORS only matters for direct calls.
+      - key: CLIENT_ORIGIN
+        value: https://haionbattery.vercel.app
+      # Uncomment with the disk above:
+      # - key: DATA_DIR
+      #   value: /var/data/data
+      # - key: UPLOAD_DIR
+      #   value: /var/data/uploads

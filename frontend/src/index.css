@@ -1,0 +1,3 @@
+/* Global base only. The website's look comes from /assets/system.css (the kit);
+   the admin panel has its own stylesheet in src/modules/admin/admin.css. */
+#root { min-height: 100svh; }
