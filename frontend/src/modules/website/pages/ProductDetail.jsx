@@ -6,7 +6,7 @@ import usePageMeta from '../components/usePageMeta.js'
 import ProductTile from '../components/ProductTile.jsx'
 import EnquiryForm from '../components/EnquiryForm.jsx'
 import Arrow from '../components/Arrow.jsx'
-import { formatPrice } from '../../../lib/api.js'
+import { priceInfo } from '../components/productUtils.js'
 
 export default function ProductDetail() {
   const { slug } = useParams()
@@ -18,6 +18,7 @@ export default function ProductDetail() {
   const setIndex = i => setPick({ slug, index: i })
 
   const product = data?.product
+  const price = product ? priceInfo(product, settings.showPrices) : null
   usePageMeta(product ? `${product.name}: ${settings.siteName}` : `Battery: ${settings.siteName}`, product?.shortDescription)
 
   if (loading) return <main id="top"><section className="section flow"><div className="wrap" aria-busy="true" /></section></main>
@@ -66,13 +67,13 @@ export default function ProductDetail() {
               <h1 id="product-h" className="page-title page-title--product">{product.name}</h1>
               {product.shortDescription && <p className="t-lead">{product.shortDescription}</p>}
               <div className="price">
-                {product.price != null
-                  ? <><span className="t-stat">{formatPrice(product.price)}</span>{product.mrp != null && product.mrp > product.price && <s className="muted">{formatPrice(product.mrp)}</s>}</>
+                {price
+                  ? <><span className="t-stat">{price.prefix}{price.amount}</span>{price.mrp && <s className="muted">{price.mrp}</s>}{price.note && <span className="muted">{price.note}</span>}</>
                   : <span className="t-lead">Price on request</span>}
               </div>
               {!product.inStock && <p className="t-small muted">Made to order. Ask for the lead time.</p>}
               <div className="btn-row">
-                <a className="btn btn--primary" href="#quote">Get a quote<Arrow /></a>
+                <a className="btn btn--primary" href="#quote">{settings.text.quoteLabel}<Arrow /></a>
                 <a className="btn btn--secondary" href={whatsappUrl(product.name)} target="_blank" rel="noopener noreferrer">Ask on WhatsApp</a>
               </div>
               {product.specs?.length > 0 && (
@@ -101,7 +102,7 @@ export default function ProductDetail() {
               type="quote"
               product={product.name}
               messageLabel="Vehicle and how you use it"
-              submitLabel="Get a quote"
+              submitLabel={settings.text.quoteLabel}
               sentLine="Your quote request is in. We will contact you with a price."
             />
           </div>

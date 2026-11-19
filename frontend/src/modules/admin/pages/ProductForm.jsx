@@ -6,7 +6,7 @@ import { Check, Confirm, Field, ImageList, Input, PageHead, Select, Textarea } f
 import { useToast } from '../components/toastState.js'
 
 const blank = {
-  name: '', categoryId: '', shortDescription: '', description: '', price: '', mrp: '',
+  name: '', categoryId: '', shortDescription: '', description: '', price: '', mrp: '', priceMode: 'exact', priceNote: '',
   images: [], specs: [], featured: false, active: true, inStock: true, sortOrder: '',
 }
 const SUGGESTED = ['Chemistry', 'Nominal voltage', 'Capacity', 'Cell format', 'Protection', 'Vehicle']
@@ -111,8 +111,16 @@ export default function ProductForm() {
         <div>
           <div className="a-card a-form">
             <h2>Price</h2>
+            <Field label="How to show the price">
+              <Select value={form.priceMode} onChange={e => set('priceMode', e.target.value)}>
+                <option value="exact">Exact price</option>
+                <option value="from">Starting from</option>
+                <option value="request">Price on request (hide the price)</option>
+              </Select>
+            </Field>
             <Field label="Price in rupees" hint="Leave empty to show Price on request."><Input type="number" min="0" inputMode="decimal" value={form.price} onChange={e => set('price', e.target.value)} /></Field>
             <Field label="List price (optional)" hint="Shown struck through when higher than the price."><Input type="number" min="0" inputMode="decimal" value={form.mrp} onChange={e => set('mrp', e.target.value)} /></Field>
+            <Field label="Price note" hint="Shown beside the price, like + 18% GST or per pack."><Input maxLength={60} value={form.priceNote} onChange={e => set('priceNote', e.target.value)} /></Field>
           </div>
           <div className="a-card a-form">
             <h2>Visibility</h2>

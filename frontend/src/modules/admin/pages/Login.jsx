@@ -3,10 +3,12 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../components/authState.js'
 import { Field, Input } from '../components/ui.jsx'
 import useKitOff from '../components/useKitOff.js'
+import useBrand from '../components/useBrand.js'
 import '../admin.css'
 
 export default function Login() {
   useKitOff()
+  const brand = useBrand()
   const { email: signedIn, checking, signIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,7 +39,7 @@ export default function Login() {
     <div className="admin">
       <div className="a-login">
         <form className="a-login__card" onSubmit={submit} noValidate>
-          <img src="/logo.png" alt="Aexto" />
+          <img src={brand.logoOnLight} alt="Aexto" />
           <div>
             <h1>Admin sign-in</h1>
             <p className="muted">Manage products, enquiries and the site&apos;s contact details.</p>

@@ -5,6 +5,13 @@ import { adminApi, formatPrice } from '../../../lib/api.js'
 import { Confirm, Input, PageHead, Select } from '../components/ui.jsx'
 import { useToast } from '../components/toastState.js'
 
+/** What the price column shows for a product, matching how the website reads it. */
+function priceLabel(p) {
+  const mode = p.priceMode || (p.price != null ? 'exact' : 'request')
+  if (mode === 'request' || p.price == null) return <span className="muted">On request</span>
+  return (mode === 'from' ? 'From ' : '') + formatPrice(p.price)
+}
+
 export default function Products() {
   const toast = useToast()
   const [products, setProducts] = useState(null)
@@ -66,7 +73,7 @@ export default function Products() {
                   </div>
                 </td>
                 <td>{catName(p.categoryId)}</td>
-                <td>{p.price != null ? formatPrice(p.price) : <span className="muted">On request</span>}</td>
+                <td>{priceLabel(p)}</td>
                 <td>
                   {p.active ? <span className="a-pill ok">Visible</span> : <span className="a-pill">Hidden</span>}{' '}
                   {p.featured && <span className="a-pill warn">Featured</span>}

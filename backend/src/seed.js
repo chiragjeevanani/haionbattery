@@ -56,7 +56,7 @@ const products = [
   prod('nmc-48v-24ah-e-bike-pack', 'NMC e-bike pack', 'e-bike-batteries',
     'A compact pack for e-bikes with a hub or mid-drive motor.',
     'An NMC pack for e-bikes and e-cycles. Cylindrical cells in a rigid case, a BMS with charge and discharge protection, and a connector matched to your controller.',
-    [PHOTO.evPack, PHOTO.terminal],
+    [PHOTO.bank, PHOTO.terminal],
     [{ label: 'Chemistry', value: 'NMC' }, { label: 'Nominal voltage', value: '48 V' }, { label: 'Capacity', value: '24 Ah' }, { label: 'Cell format', value: 'Cylindrical' }, { label: 'Vehicle', value: 'E-bike' }],
     { featured: true, sortOrder: 3 }),
   prod('lifepo4-51v-30ah-e-bike-pack', 'LiFePO4 e-bike pack', 'e-bike-batteries',

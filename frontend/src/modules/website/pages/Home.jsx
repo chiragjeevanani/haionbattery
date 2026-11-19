@@ -11,7 +11,7 @@ import Arrow from '../components/Arrow.jsx'
 /** Full-bleed photograph, the words in a solid box on its calm side. */
 function Hero() {
   const { settings, whatsappUrl } = useSite()
-  const { hero } = settings
+  const { hero, text } = settings
   return (
     <section className="hero hero--photo" data-enter data-calm="left" aria-labelledby="hero-h">
       <img className="hero__bg" src={hero.image} alt={hero.imageAlt} style={{ '--ly-pos': '50% 45%' }} fetchPriority="high" />
@@ -21,8 +21,8 @@ function Hero() {
             <h1 id="hero-h">{hero.headline}</h1>
             <p className="hero__lead">{hero.lead}</p>
             <div className="btn-row">
-              <Link className="btn btn--primary" to="/contact">Get a quote<Arrow /></Link>
-              <a className="btn btn--secondary" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+              <Link className="btn btn--primary" to="/contact">{text.quoteLabel}<Arrow /></Link>
+              <a className="btn btn--secondary" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">{text.whatsappLabel}</a>
             </div>
           </div>
         </div>
@@ -32,11 +32,12 @@ function Hero() {
 }
 
 function Designer() {
+  const { text } = useSite().settings
   return (
     <section className="section ground-surface" id="designer" aria-labelledby="designer-h">
       <div className="wrap">
         <div className="section-head">
-          <h2 id="designer-h">Design your pack. <span className="muted">See the cells it takes.</span></h2>
+          <h2 id="designer-h">{text.designerHeading} <span className="muted">{text.designerSub}</span></h2>
         </div>
         <PackBuilder />
       </div>
@@ -46,7 +47,8 @@ function Designer() {
 
 /** Vehicle panels: the one you point at opens, the others narrow. */
 function Range({ products }) {
-  const { categories } = useSite()
+  const { categories, settings } = useSite()
+  const { text } = settings
   const [active, setActive] = useState(0)
   if (!categories.length) return null
   const count = id => products.filter(p => p.categoryId === id).length
@@ -55,8 +57,8 @@ function Range({ products }) {
     <section className="section" id="range" aria-labelledby="range-h">
       <div className="wrap">
         <div className="section-head section-head--split">
-          <div><h2 id="range-h">Packs for every vehicle</h2></div>
-          <Link className="btn btn--secondary" to="/products">See all batteries</Link>
+          <div><h2 id="range-h">{text.rangeHeading}</h2></div>
+          <Link className="btn btn--secondary" to="/products">{text.seeAllLabel}</Link>
         </div>
         <div className="vpanels">
           {categories.map((c, i) => (
@@ -123,6 +125,7 @@ function Process() {
 }
 
 function Popular({ products }) {
+  const { text } = useSite().settings
   const featured = products.filter(p => p.featured).slice(0, 4)
   const list = featured.length ? featured : products.slice(0, 4)
   if (!list.length) return null
@@ -130,8 +133,8 @@ function Popular({ products }) {
     <section className="section" id="popular" aria-labelledby="popular-h">
       <div className="wrap">
         <div className="section-head section-head--split">
-          <div><h2 id="popular-h">Popular battery packs</h2></div>
-          <Link className="btn btn--secondary" to="/products">See all batteries</Link>
+          <div><h2 id="popular-h">{text.popularHeading}</h2></div>
+          <Link className="btn btn--secondary" to="/products">{text.seeAllLabel}</Link>
         </div>
         <div className="grid">
           {list.map(p => <div key={p.id} className="span-3"><ProductTile product={p} /></div>)}
@@ -142,13 +145,13 @@ function Popular({ products }) {
 }
 
 function Faq() {
-  const { faqs } = useSite()
+  const { faqs, settings } = useSite()
   if (!faqs.length) return null
   return (
     <section className="section ground-surface" id="faq" aria-labelledby="faq-h">
       <div className="wrap grid">
         <div className="span-5">
-          <div className="section-head"><h2 id="faq-h">Questions before you order</h2></div>
+          <div className="section-head"><h2 id="faq-h">{settings.text.faqHeading}</h2></div>
           <div className="btn-row"><Link className="btn btn--secondary" to="/faqs">Read all questions</Link></div>
         </div>
         <div className="faq span-6 start-7">

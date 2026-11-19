@@ -11,8 +11,8 @@ export default function Contact() {
         <div className="wrap grid grid--top">
           <div className="span-5 stack-5">
             <div className="section-head">
-              <h1 id="contact-h" className="page-title">Get a quote</h1>
-              <p>Tell us the vehicle, voltage and capacity you need. Or reach us directly.</p>
+              <h1 id="contact-h" className="page-title">{settings.text.quoteLabel}</h1>
+              <p>{settings.text.contactText}</p>
             </div>
             <ul className="rows">
               {settings.phone && (
@@ -28,7 +28,7 @@ export default function Contact() {
             <EnquiryForm
               type="quote"
               messageLabel="What do you need?"
-              submitLabel="Get a quote"
+              submitLabel={settings.text.quoteLabel}
               sentLine="Your quote request is in. We will contact you with a price."
             />
           </div>

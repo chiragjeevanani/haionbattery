@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { load, save } from '../db.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { uid, str, num, bool, strList, specList, uniqueSlug, digits } from '../utils.js';
+import { DEFAULT_SETTINGS } from '../defaults.js';
 
 const router = Router();
 router.use(requireAdmin);
@@ -57,7 +58,8 @@ const cleanCategory = (b, db, existing) => {
     value: {
       ...(existing || { id: uid() }),
       name,
-      slug: uniqueSlug(name, db.categories, existing?.id),
+      // the address is set once and then stays, so links and bookmarks keep working after an edit
+      slug: existing?.slug || uniqueSlug(name, db.categories),
       description: str(b.description, 400),
       image: str(b.image, 500),
       sortOrder: num(b.sortOrder) ?? (existing?.sortOrder ?? db.categories.length + 1),
@@ -76,7 +78,7 @@ const cleanProduct = (b, db, existing) => {
     value: {
       ...(existing || { id: uid(), createdAt: new Date().toISOString() }),
       name,
-      slug: uniqueSlug(name, db.products, existing?.id),
+      slug: existing?.slug || uniqueSlug(name, db.products),
       categoryId: b.categoryId,
       shortDescription: str(b.shortDescription, 220),
       description: str(b.description, 6000),
@@ -84,6 +86,9 @@ const cleanProduct = (b, db, existing) => {
       specs: specList(b.specs),
       price: num(b.price),
       mrp: num(b.mrp),
+      // how the price reads on the site; with no price it can only be "on request"
+      priceMode: num(b.price) == null ? 'request' : (['exact', 'from', 'request'].includes(b.priceMode) ? b.priceMode : 'exact'),
+      priceNote: str(b.priceNote, 60),
       featured: bool(b.featured),
       active: b.active === undefined ? true : bool(b.active),
       inStock: b.inStock === undefined ? true : bool(b.inStock),
@@ -157,6 +162,8 @@ crud('faqs', cleanFaq, { sort: (a, b) => a.sortOrder - b.sortOrder });
 
 /* ------------------------------------------------------------ settings */
 const obj = (v) => (v && typeof v === 'object' ? v : {});
+/** Wording and logos never save empty: a cleared field goes back to its default. */
+const filled = (o, defaults) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v || defaults[k]]));
 const block = (v, keys, caps = {}) => Object.fromEntries(keys.map(k => [k, str(obj(v)[k], caps[k] || 600)]));
 
 router.get('/settings', (_req, res) => res.json(load().settings));
@@ -191,9 +198,12 @@ router.put('/settings', (req, res) => {
       heading: str(obj(b.process).heading, 80),
       steps: (Array.isArray(obj(b.process).steps) ? b.process.steps : []).slice(0, 3).map(st => block(st, ['title', 'text', 'image', 'imageAlt'], { title: 60, text: 240, image: 500, imageAlt: 200 })),
     },
+    branding: filled(block(b.branding, ['logoOnDark', 'logoOnLight', 'favicon'], { logoOnDark: 500, logoOnLight: 500, favicon: 500 }), DEFAULT_SETTINGS.branding),
+    text: filled(block(b.text, Object.keys(DEFAULT_SETTINGS.text), { quoteLabel: 30, whatsappLabel: 30, seeAllLabel: 30, designerHeading: 60, designerSub: 60, rangeHeading: 60, popularHeading: 60, faqHeading: 60, closeText: 200, productsHeading: 40, productsIntro: 240, contactText: 240 }), DEFAULT_SETTINGS.text),
     statement: block(b.statement, ['heading', 'text'], { heading: 40, text: 240 }),
     closing: block(b.closing, ['image', 'imageAlt'], { image: 500, imageAlt: 200 }),
     about: block(b.about, ['heading', 'body', 'image', 'imageAlt'], { heading: 80, body: 3000, image: 500, imageAlt: 200 }),
+    showPrices: b.showPrices === undefined ? true : bool(b.showPrices),
     footerLede: str(b.footerLede, 200),
     seo: block(b.seo, ['title', 'description'], { title: 90, description: 200 }),
   };

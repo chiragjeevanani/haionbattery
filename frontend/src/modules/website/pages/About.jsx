@@ -14,7 +14,7 @@ export default function About() {
           <div className="span-5 stack-5">
             <div className="section-head"><h1 id="about-h" className="page-title">{a.heading}</h1></div>
             {a.body.split('\n\n').map((para, i) => <p key={i} className="t-lead">{para}</p>)}
-            <div className="btn-row"><Link className="btn btn--primary" to="/contact">Get a quote<Arrow /></Link></div>
+            <div className="btn-row"><Link className="btn btn--primary" to="/contact">{settings.text.quoteLabel}<Arrow /></Link></div>
           </div>
           <div className="frame frame--photo span-6 start-7 about-photo">
             <img className="frame__img" src={a.image} alt={a.imageAlt} />

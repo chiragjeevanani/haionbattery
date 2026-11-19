@@ -19,7 +19,7 @@ export default function Products() {
   const products = data || []
 
   const active = categories.find(c => c.slug === category)
-  const title = active ? active.name : 'Batteries'
+  const title = active ? active.name : settings.text.productsHeading
   usePageMeta(`${title}: ${settings.siteName}`, active?.description || `Lithium battery packs for electric vehicles and solar storage from ${settings.siteName}.`)
 
   const setCategory = slug => {
@@ -40,7 +40,7 @@ export default function Products() {
         <div className="wrap">
           <div className="section-head">
             <h1 id="products-h" className="page-title">{title}</h1>
-            <p>{active?.description || 'Battery packs for cars, bikes, scooters, e-rickshaws and solar storage. Open one to ask for a price.'}</p>
+            <p>{active?.description || settings.text.productsIntro}</p>
           </div>
 
           <div className="filters">

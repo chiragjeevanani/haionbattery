@@ -22,19 +22,31 @@ function ScrollManager() {
 
 /** Rendered into <body> itself: the kit's CSS looks for body > nav.actionbar to drop the header's own button on a phone. */
 function ActionBar() {
-  const { whatsappUrl } = useSite()
+  const { whatsappUrl, settings } = useSite()
   return createPortal(
     <nav className="actionbar" aria-label="Quick actions" data-bar="always">
       <a className="btn btn--secondary" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-      <Link className="btn btn--primary" to="/contact">Get a quote</Link>
+      <Link className="btn btn--primary" to="/contact">{settings.text.quoteLabel}</Link>
     </nav>,
     document.body,
   )
 }
 
+/** The tab icon follows the favicon set in the admin. */
+function Favicon() {
+  const { settings } = useSite()
+  const href = settings.branding.favicon
+  useEffect(() => {
+    const link = document.querySelector('link[rel="icon"]')
+    if (link && href) link.href = href
+  }, [href])
+  return null
+}
+
 function Shell() {
   return (
     <>
+      <Favicon />
       <ScrollManager />
       <Nav />
       <Outlet />

@@ -4,6 +4,7 @@ import { ExternalLink, HelpCircle, Inbox, LayoutDashboard, LogOut, Menu, Package
 import { adminApi } from '../../../lib/api.js'
 import { useAuth } from './authState.js'
 import useKitOff from './useKitOff.js'
+import useBrand from './useBrand.js'
 import '../admin.css'
 
 const items = [
@@ -18,6 +19,7 @@ const items = [
 
 export default function AdminLayout() {
   useKitOff()
+  const brand = useBrand()
   const { email, checking, signOut } = useAuth()
   const { pathname } = useLocation()
   // The menu is open "at" a path, so it closes by itself when the page changes.
@@ -38,13 +40,13 @@ export default function AdminLayout() {
     <div className="admin">
       <div className="admin-top">
         <button className="a-btn a-btn--icon" type="button" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(true)}><Menu /></button>
-        <img src="/logo.png" alt="Aexto admin" />
+        <img src={brand.logoOnLight} alt="Aexto admin" />
       </div>
       {open && <div className="admin-scrim" onClick={() => setOpen(false)} />}
       <div className="admin-shell">
         <aside className={`admin-side${open ? ' open' : ''}`} aria-label="Admin menu">
           <Link className="admin-brand" to="/admin">
-            <img src="/logo-light.png" alt="Aexto" />
+            <img src={brand.logoOnDark} alt="Aexto" />
             <span>Admin</span>
           </Link>
           <nav className="admin-nav">

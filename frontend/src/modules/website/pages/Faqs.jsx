@@ -11,7 +11,7 @@ export default function Faqs() {
         <div className="wrap grid">
           <div className="span-5">
             <div className="section-head">
-              <h1 id="faqs-h" className="page-title">Questions before you order</h1>
+              <h1 id="faqs-h" className="page-title">{settings.text.faqHeading}</h1>
               <p>Not here? <Link className="link" to="/contact">Ask us directly</Link>.</p>
             </div>
           </div>

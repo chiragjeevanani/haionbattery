@@ -14,10 +14,10 @@ export default function Footer() {
         <div className="closing__cta close--photo">
           <div className="section-head--split">
             <div>
-              <h2 id="close-h">Get a quote</h2>
-              <p className="t-lead">Tell us the vehicle, voltage and capacity you need and we reply with a price.</p>
+              <h2 id="close-h">{settings.text.quoteLabel}</h2>
+              <p className="t-lead">{settings.text.closeText}</p>
             </div>
-            <Link className="btn btn--primary" to="/contact">Get a quote<Arrow /></Link>
+            <Link className="btn btn--primary" to="/contact">{settings.text.quoteLabel}<Arrow /></Link>
           </div>
           <div className="close__media">
             <img src={closing.image} alt={closing.imageAlt} loading="lazy" style={{ '--pos': '50% 60%' }} />
@@ -28,7 +28,7 @@ export default function Footer() {
           <div className="grid">
             <div className="span-4 stack-4">
               <Link className="nav__logo" to="/" aria-label={`${settings.siteName}, home`}>
-                <img className="nav__logo-img" src="/logo-light.png" alt={settings.siteName} width="150" height="44" />
+                <img className="nav__logo-img" src={settings.branding.logoOnDark} alt={settings.siteName} width="150" height="44" />
               </Link>
               <p className="footer__lede">{settings.footerLede}</p>
             </div>

@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
 import { adminApi } from '../../../lib/api.js'
-import { Field, Input, PageHead, SingleImage, Textarea } from '../components/ui.jsx'
+import { Check, Field, Input, PageHead, SingleImage, Textarea } from '../components/ui.jsx'
 import { useToast } from '../components/toastState.js'
 
 const TABS = [
   ['contact', 'Contact and WhatsApp'],
   ['home', 'Home page'],
   ['pages', 'Other pages'],
+  ['text', 'Page text'],
+  ['brand', 'Logo and icon'],
   ['seo', 'Search and footer'],
 ]
 
@@ -150,6 +152,52 @@ export default function Settings() {
             <Field label="Describe the picture"><Input {...text('about.imageAlt')} /></Field>
           </div>
         </>
+      )}
+
+      {tab === 'text' && (
+        <>
+          <div className="a-card a-form">
+            <h2>Prices</h2>
+            <p className="lede muted">Each product sets its own price in Products. This switch hides every price at once and shows Price on request instead.</p>
+            <Check label="Show prices on the website" checked={s.showPrices} onChange={v => set('showPrices', v)} />
+          </div>
+          <div className="a-card a-form">
+            <h2>Buttons</h2>
+            <p className="lede muted">The main action reads the same everywhere it appears: menu, home page, product pages, contact page and footer.</p>
+            <div className="a-grid three">
+              <Field label="Main action" hint="A verb and what they get."><Input maxLength={30} {...text('text.quoteLabel')} /></Field>
+              <Field label="WhatsApp button on the home page"><Input maxLength={30} {...text('text.whatsappLabel')} /></Field>
+              <Field label="Link to the full range"><Input maxLength={30} {...text('text.seeAllLabel')} /></Field>
+            </div>
+          </div>
+          <div className="a-card a-form">
+            <h2>Home page headings</h2>
+            <div className="a-grid two">
+              <Field label="Pack designer heading"><Input maxLength={60} {...text('text.designerHeading')} /></Field>
+              <Field label="Pack designer second line" hint="Shown in grey."><Input maxLength={60} {...text('text.designerSub')} /></Field>
+              <Field label="Vehicle panels heading"><Input maxLength={60} {...text('text.rangeHeading')} /></Field>
+              <Field label="Popular products heading"><Input maxLength={60} {...text('text.popularHeading')} /></Field>
+              <Field label="Questions heading" hint="Also the title of the Questions page."><Input maxLength={60} {...text('text.faqHeading')} /></Field>
+            </div>
+          </div>
+          <div className="a-card a-form">
+            <h2>Other pages and footer</h2>
+            <Field label="Footer line under the main action"><Textarea rows={2} maxLength={200} {...text('text.closeText')} /></Field>
+            <Field label="Products page title"><Input maxLength={40} {...text('text.productsHeading')} /></Field>
+            <Field label="Products page intro"><Textarea rows={2} maxLength={240} {...text('text.productsIntro')} /></Field>
+            <Field label="Contact page intro"><Textarea rows={2} maxLength={240} {...text('text.contactText')} /></Field>
+          </div>
+        </>
+      )}
+
+      {tab === 'brand' && (
+        <div className="a-card a-form">
+          <h2>Logo and icon</h2>
+          <p className="lede muted">Upload PNG files with a transparent background. The website header and footer are dark, so use a version that reads on dark there.</p>
+          <SingleImage label="Logo for dark backgrounds" hint="Used in the website header and footer." value={s.branding.logoOnDark} onChange={v => set('branding.logoOnDark', v)} />
+          <SingleImage label="Logo for light backgrounds" hint="Used on the admin sign-in page." value={s.branding.logoOnLight} onChange={v => set('branding.logoOnLight', v)} />
+          <SingleImage label="Browser tab icon" hint="Square, at least 64 px." value={s.branding.favicon} onChange={v => set('branding.favicon', v)} />
+        </div>
       )}
 
       {tab === 'seo' && (

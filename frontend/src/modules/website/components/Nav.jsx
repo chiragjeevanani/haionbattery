@@ -38,7 +38,7 @@ export default function Nav() {
       <div className="wrap nav__bar">
         <a className="skip-link" href="#top">Skip to content</a>
         <Link className="nav__logo" to="/" aria-label={`${settings.siteName}, home`}>
-          <img className="nav__logo-img" src="/logo-light.png" alt={settings.siteName} width="150" height="44" />
+          <img className="nav__logo-img" src={settings.branding.logoOnDark} alt={settings.siteName} width="150" height="44" />
         </Link>
         <nav className="nav__links" aria-label="Main">
           <div className={`nav__item${expanded ? ' is-expanded' : ''}`}>
@@ -67,7 +67,7 @@ export default function Nav() {
         </nav>
         <div className="nav__actions">
           <a className="nav__link" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          <Link className="btn btn--primary" to="/contact">Get a quote</Link>
+          <Link className="btn btn--primary" to="/contact">{settings.text.quoteLabel}</Link>
         </div>
         <button className="nav__toggle" type="button" aria-expanded={open} aria-label="Menu" onClick={() => setOpen(v => !v)}>
           {open ? cross : bars}
