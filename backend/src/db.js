@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withDefaults } from './defaults.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 // DATA_DIR lets a host point the database at a persistent disk.
@@ -17,6 +18,7 @@ export function load() {
   if (cache) return cache;
   if (!fs.existsSync(FILE)) throw new Error('Database not found. Run "npm run seed" in /backend first.');
   cache = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+  cache.settings = withDefaults(cache.settings);
   return cache;
 }
 

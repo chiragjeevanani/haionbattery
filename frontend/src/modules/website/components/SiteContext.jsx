@@ -29,6 +29,8 @@ export function SiteProvider({ children }) {
         const text = (template || '').replace('{product}', productName || '')
         return `https://wa.me/${wa}?text=${encodeURIComponent(text)}`
       },
+      /** wa.me link with a message written by the page (the pack designer). */
+      whatsappTextUrl: text => `https://wa.me/${wa}?text=${encodeURIComponent(text)}`,
       telUrl: phoneDigits ? `tel:+${phoneDigits}` : '',
       mailUrl: settings.email ? `mailto:${settings.email}` : '',
     }

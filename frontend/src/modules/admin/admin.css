@@ -39,7 +39,7 @@
   padding: 20px 14px; background: var(--a-side); color: var(--a-side-ink);
 }
 .admin-brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px; text-decoration: none; }
-.admin-brand img { height: 30px; width: auto; background: #fff; border-radius: 6px; padding: 3px 6px; }
+.admin-brand img { height: 32px; width: auto; }
 .admin-brand span { font-size: 13px; color: #9a9c9e; }
 .admin-nav { display: grid; gap: 2px; }
 .admin-nav a {

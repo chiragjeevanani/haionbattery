@@ -47,7 +47,7 @@ export default function Settings() {
   }
 
   const waDigits = String(s.whatsappNumber || '').replace(/\D/g, '')
-  const sample = (s.whatsappProductMessage || '').replace('{product}', '60 V 30 Ah LiFePO4 e-rickshaw pack')
+  const sample = (s.whatsappProductMessage || '').replace('{product}', 'LiFePO4 e-rickshaw pack')
   const waTest = waDigits ? `https://wa.me/${waDigits}?text=${encodeURIComponent(s.whatsappGeneralMessage || '')}` : ''
 
   return (
@@ -99,36 +99,57 @@ export default function Settings() {
         <>
           <div className="a-card a-form">
             <h2>Top of the home page</h2>
-            <Field label="Headline" hint="Say what you sell and to whom, in a few words."><Input maxLength={80} {...text('hero.headline')} /></Field>
+            <Field label="Headline" hint="Say what you sell, in about 30 characters. It is set very large."><Input maxLength={40} {...text('hero.headline')} /></Field>
             <Field label="Line under the headline" hint="Include one hard fact, like a voltage range."><Textarea rows={3} maxLength={300} {...text('hero.lead')} /></Field>
-            <SingleImage label="Hero picture" hint="Wide and sharp, at least 1600 px across." value={s.hero.image} onChange={v => set('hero.image', v)} />
+            <SingleImage label="Hero picture" hint="Wide and sharp, at least 1600 px across. The headline sits on the left, so keep the subject to the right." value={s.hero.image} onChange={v => set('hero.image', v)} />
             <Field label="Describe the hero picture" hint="Read aloud by screen readers."><Input {...text('hero.imageAlt')} /></Field>
           </div>
           <div className="a-card a-form">
-            <h2>Custom packs section</h2>
+            <h2>Large statement</h2>
+            <p className="lede muted">The big line whose letters fly into place as visitors scroll.</p>
+            <Field label="Statement" hint="Two to five words. Keep it under 28 letters."><Input maxLength={40} {...text('statement.heading')} /></Field>
+            <Field label="Line under it"><Textarea rows={2} maxLength={240} {...text('statement.text')} /></Field>
+          </div>
+          <div className="a-card a-form">
+            <h2>How a pack is made</h2>
+            <p className="lede muted">Three steps on the dark section, each with a picture.</p>
+            <Field label="Section heading"><Input {...text('process.heading')} /></Field>
+            {(s.process.steps || []).map((st, i) => (
+              <div className="a-card a-form" key={i} style={{ background: 'var(--a-bg)' }}>
+                <h3>Step {i + 1}</h3>
+                <Field label="Title"><Input maxLength={60} {...text(`process.steps.${i}.title`)} /></Field>
+                <Field label="Text"><Textarea rows={2} maxLength={240} {...text(`process.steps.${i}.text`)} /></Field>
+                <SingleImage label="Picture" value={st.image} onChange={v => set(`process.steps.${i}.image`, v)} />
+                <Field label="Describe the picture"><Input {...text(`process.steps.${i}.imageAlt`)} /></Field>
+              </div>
+            ))}
+          </div>
+          <div className="a-card a-form">
+            <h2>Closing picture</h2>
+            <p className="lede muted">The wide picture above the footer, under the Get a quote line.</p>
+            <SingleImage label="Picture" hint="Wide. It is cropped to a strip." value={s.closing.image} onChange={v => set('closing.image', v)} />
+            <Field label="Describe the picture"><Input {...text('closing.imageAlt')} /></Field>
+          </div>
+        </>
+      )}
+
+      {tab === 'pages' && (
+        <>
+          <div className="a-card a-form">
+            <h2>Custom packs page</h2>
             <Field label="Heading"><Input {...text('custom.heading')} /></Field>
             <Field label="Text"><Textarea rows={3} {...text('custom.text')} /></Field>
             <SingleImage label="Picture" value={s.custom.image} onChange={v => set('custom.image', v)} />
             <Field label="Describe the picture"><Input {...text('custom.imageAlt')} /></Field>
           </div>
           <div className="a-card a-form">
-            <h2>Storage section</h2>
-            <Field label="Heading"><Input {...text('storage.heading')} /></Field>
-            <Field label="Text"><Textarea rows={3} {...text('storage.text')} /></Field>
-            <SingleImage label="Picture" value={s.storage.image} onChange={v => set('storage.image', v)} />
-            <Field label="Describe the picture"><Input {...text('storage.imageAlt')} /></Field>
+            <h2>About page</h2>
+            <Field label="Heading"><Input {...text('about.heading')} /></Field>
+            <Field label="Text" hint="Leave a blank line between paragraphs."><Textarea rows={8} {...text('about.body')} /></Field>
+            <SingleImage label="Picture" value={s.about.image} onChange={v => set('about.image', v)} />
+            <Field label="Describe the picture"><Input {...text('about.imageAlt')} /></Field>
           </div>
         </>
-      )}
-
-      {tab === 'pages' && (
-        <div className="a-card a-form">
-          <h2>About page</h2>
-          <Field label="Heading"><Input {...text('about.heading')} /></Field>
-          <Field label="Text" hint="Leave a blank line between paragraphs."><Textarea rows={8} {...text('about.body')} /></Field>
-          <SingleImage label="Picture" value={s.about.image} onChange={v => set('about.image', v)} />
-          <Field label="Describe the picture"><Input {...text('about.imageAlt')} /></Field>
-        </div>
       )}
 
       {tab === 'seo' && (

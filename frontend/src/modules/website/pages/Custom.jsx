@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import { useSite } from '../components/siteState.js'
 import usePageMeta from '../components/usePageMeta.js'
 import EnquiryForm from '../components/EnquiryForm.jsx'
@@ -5,6 +6,14 @@ import EnquiryForm from '../components/EnquiryForm.jsx'
 export default function Custom() {
   const { settings, whatsappUrl } = useSite()
   const c = settings.custom
+  const [params] = useSearchParams()
+  const chemistry = params.get('chemistry')
+  const defaults = {
+    vehicle: params.get('vehicle') || '',
+    voltage: params.get('voltage') || '',
+    capacity: params.get('capacity') || '',
+    message: chemistry ? `Chemistry: ${chemistry}` : '',
+  }
   usePageMeta(`Custom battery packs: ${settings.siteName}`, c.text)
   return (
     <main id="top">
@@ -22,6 +31,8 @@ export default function Custom() {
           </div>
           <div className="span-5 start-8">
             <EnquiryForm
+              key={params.toString()}
+              defaults={defaults}
               type="custom"
               fields={[
                 { name: 'vehicle', label: 'Vehicle' },

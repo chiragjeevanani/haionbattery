@@ -2,6 +2,7 @@ import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { dbExists, save } from './db.js';
 import { uid } from './utils.js';
+import { DEFAULT_SETTINGS, PHOTO } from './defaults.js';
 
 const force = process.argv.includes('--force');
 if (dbExists() && !force) {
@@ -9,16 +10,6 @@ if (dbExists() && !force) {
   process.exit(0);
 }
 
-const img = id => `/assets/img/photo-${id}-960.jpg`;
-const PHOTO = {
-  bank: img('f78835636'),
-  terminal: img('f78835637'),
-  evPack: img('f23083583'),
-  storage: img('f159414990'),
-  rickshaw: img('f71573466'),
-  bms: img('f112489495'),
-  solar: img('f123189212'),
-};
 
 const cat = (slug, name, description, image, sortOrder) => ({ id: uid(), slug, name, description, image, sortOrder });
 const categories = [
@@ -37,49 +28,49 @@ const prod = (slug, name, category, shortDescription, description, images, specs
 });
 
 const products = [
-  prod('lifepo4-60v-30ah-e-rickshaw-pack', '60 V 30 Ah LiFePO4 e-rickshaw pack', 'e-rickshaw-batteries',
+  prod('lifepo4-60v-30ah-e-rickshaw-pack', 'LiFePO4 e-rickshaw pack', 'e-rickshaw-batteries',
     'Drop-in pack for passenger e-rickshaws, with a smart BMS.',
     'A LiFePO4 pack for passenger e-rickshaws. It replaces a lead-acid set in the same tray, weighs a fraction of it and holds its capacity through daily deep cycles. The BMS protects against over-charge, over-discharge, short circuit and over-temperature.',
     [PHOTO.rickshaw, PHOTO.bank],
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '60 V' }, { label: 'Capacity', value: '30 Ah' }, { label: 'Protection', value: 'Smart BMS' }, { label: 'Vehicle', value: 'E-rickshaw' }],
     { featured: true, sortOrder: 1 }),
-  prod('lifepo4-48v-40ah-e-rickshaw-pack', '48 V 40 Ah LiFePO4 e-rickshaw pack', 'e-rickshaw-batteries',
+  prod('lifepo4-48v-40ah-e-rickshaw-pack', 'LiFePO4 e-rickshaw loader pack', 'e-rickshaw-batteries',
     'A longer-range pack for cargo and passenger loaders.',
     'A 48 V LiFePO4 pack for loaders and passenger e-rickshaws that run long shifts. Built from prismatic cells with copper busbars and a BMS rated for the controller current.',
     [PHOTO.bank, PHOTO.terminal],
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '48 V' }, { label: 'Capacity', value: '40 Ah' }, { label: 'Cell format', value: 'Prismatic' }, { label: 'Vehicle', value: 'E-rickshaw, loader' }],
     { featured: true, sortOrder: 2 }),
-  prod('nmc-48v-24ah-e-bike-pack', '48 V 24 Ah NMC e-bike pack', 'e-bike-batteries',
+  prod('nmc-48v-24ah-e-bike-pack', 'NMC e-bike pack', 'e-bike-batteries',
     'A compact pack for e-bikes with a hub or mid-drive motor.',
     'An NMC pack for e-bikes and e-cycles. Cylindrical cells in a rigid case, a BMS with charge and discharge protection, and a connector matched to your controller.',
     [PHOTO.evPack, PHOTO.terminal],
     [{ label: 'Chemistry', value: 'NMC' }, { label: 'Nominal voltage', value: '48 V' }, { label: 'Capacity', value: '24 Ah' }, { label: 'Cell format', value: 'Cylindrical' }, { label: 'Vehicle', value: 'E-bike' }],
     { featured: true, sortOrder: 3 }),
-  prod('lifepo4-51v-30ah-e-bike-pack', '51.2 V 30 Ah LiFePO4 e-bike pack', 'e-bike-batteries',
+  prod('lifepo4-51v-30ah-e-bike-pack', 'LiFePO4 e-bike pack', 'e-bike-batteries',
     'LiFePO4 pack for e-bikes that need long cycle life.',
     'A 16-cell LiFePO4 pack for e-bikes and cargo cycles. Lower energy density than NMC, but far more charge cycles and better heat tolerance.',
     [PHOTO.solar, PHOTO.terminal],
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '51.2 V' }, { label: 'Capacity', value: '30 Ah' }, { label: 'Vehicle', value: 'E-bike, cargo cycle' }],
     { sortOrder: 4 }),
-  prod('nmc-72v-30ah-scooter-pack', '72 V 30 Ah NMC scooter pack', 'scooter-batteries',
+  prod('nmc-72v-30ah-scooter-pack', 'NMC scooter pack', 'scooter-batteries',
     'High-discharge pack for electric scooters and motorcycles.',
     'A high-discharge NMC pack for electric scooters and motorcycles. Sized for 72 V controllers, with a BMS rated for the peak current of the motor.',
     [PHOTO.terminal, PHOTO.evPack],
     [{ label: 'Chemistry', value: 'NMC' }, { label: 'Nominal voltage', value: '72 V' }, { label: 'Capacity', value: '30 Ah' }, { label: 'Discharge', value: 'High-current BMS' }, { label: 'Vehicle', value: 'Scooter, motorcycle' }],
     { featured: true, sortOrder: 5 }),
-  prod('lifepo4-51v-100ah-storage-rack', '51.2 V 100 Ah LiFePO4 storage battery', 'solar-inverter-batteries',
+  prod('lifepo4-51v-100ah-storage-rack', 'LiFePO4 storage battery', 'solar-inverter-batteries',
     'Rack battery for home solar and shop backup.',
     'A 16-cell LiFePO4 storage battery for solar systems and backup. It works with 48 V inverters, reports state of charge over its communication port and can be paralleled for more capacity.',
     [PHOTO.storage, PHOTO.solar, PHOTO.bank],
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '51.2 V' }, { label: 'Capacity', value: '100 Ah' }, { label: 'Communication', value: 'RS485 / CAN' }, { label: 'Use', value: 'Solar storage, backup' }],
     { featured: true, sortOrder: 6 }),
-  prod('lifepo4-12v-100ah-inverter-battery', '12.8 V 100 Ah LiFePO4 inverter battery', 'solar-inverter-batteries',
+  prod('lifepo4-12v-100ah-inverter-battery', 'LiFePO4 inverter battery', 'solar-inverter-batteries',
     'Replaces a lead-acid inverter battery in the same space.',
     'A 12.8 V LiFePO4 battery for home inverters and small solar setups. Built-in BMS, no water top-ups and no acid fumes.',
     [PHOTO.solar, PHOTO.storage],
     [{ label: 'Chemistry', value: 'LiFePO4' }, { label: 'Nominal voltage', value: '12.8 V' }, { label: 'Capacity', value: '100 Ah' }, { label: 'Use', value: 'Home inverter' }],
     { sortOrder: 7 }),
-  prod('smart-bms-16s-100a', 'Smart BMS 16S 100 A', 'bms-and-parts',
+  prod('smart-bms-16s-100a', 'Smart BMS for 16-cell packs', 'bms-and-parts',
     'Battery management board for 16-cell LiFePO4 packs.',
     'A 16-series BMS for 51.2 V LiFePO4 packs, with cell balancing, temperature sensing and a communication port for monitoring.',
     [PHOTO.bms],
@@ -99,47 +90,7 @@ const adminPassword = process.env.ADMIN_PASSWORD || 'Aexto@12345';
 
 const db = {
   admin: { email: adminEmail, passwordHash: bcrypt.hashSync(adminPassword, 10) },
-  settings: {
-    siteName: 'Aexto',
-    tagline: 'Inspiring Innovation',
-    phone: '+91 00000 00000',
-    whatsappNumber: '910000000000',
-    whatsappProductMessage: 'Hello Aexto, I would like a quote for {product}.',
-    whatsappGeneralMessage: 'Hello Aexto, I would like a quote for a vehicle battery.',
-    email: '',
-    address: '',
-    hours: '',
-    social: { instagram: '', facebook: '', youtube: '', linkedin: '' },
-    hero: {
-      headline: 'Lithium batteries for electric vehicles',
-      lead: 'LiFePO4 and NMC battery packs from 12 V to 72 V for e-bikes, e-rickshaws, scooters and solar storage, made to your voltage, capacity and size.',
-      image: PHOTO.bank,
-      imageAlt: 'A bank of yellow LiFePO4 cells joined by aluminium busbars',
-    },
-    custom: {
-      heading: 'Custom battery packs',
-      text: 'Tell us the voltage, capacity, peak current and the space in your vehicle. We choose the cells and the BMS and quote a pack that fits.',
-      image: PHOTO.evPack,
-      imageAlt: 'An open EV battery pack with cells, busbars and wiring',
-    },
-    storage: {
-      heading: 'Storage for solar and backup',
-      text: 'Rack and wall batteries in LiFePO4 for homes, shops and small solar plants. They talk to the inverter and add up by paralleling.',
-      image: PHOTO.storage,
-      imageAlt: 'Rows of white battery storage containers beside a solar field',
-    },
-    about: {
-      heading: 'About Aexto',
-      body: 'Aexto designs and assembles lithium battery packs for electric vehicles and energy storage.\n\nEach pack is built around a choice of cells and a battery management system that suits the vehicle, then tested before it leaves us.',
-      image: PHOTO.terminal,
-      imageAlt: 'Copper and aluminium terminals on LiFePO4 cells',
-    },
-    footerLede: 'Lithium battery packs for electric vehicles and solar storage.',
-    seo: {
-      title: 'Aexto: lithium batteries for electric vehicles',
-      description: 'LiFePO4 and NMC battery packs for e-bikes, e-rickshaws, scooters and solar storage, made to your voltage and size.',
-    },
-  },
+  settings: DEFAULT_SETTINGS,
   categories,
   products,
   brands: [],

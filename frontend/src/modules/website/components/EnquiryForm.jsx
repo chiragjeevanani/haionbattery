@@ -12,7 +12,8 @@ export default function EnquiryForm({
   fields = [],            // extra fields: [{ name, label, inputMode, autoComplete }]
   messageLabel = 'Message',
   submitLabel = 'Send enquiry',
-  sentLine = 'Your enquiry is in. We reply within one working day.',
+  sentLine = 'Your enquiry is in. We will contact you soon.',
+  defaults = {},          // starting values by field name, like the pack designer's choice
 }) {
   const uid = useId()
   const formRef = useRef(null)
@@ -70,6 +71,7 @@ export default function EnquiryForm({
         name={name}
         aria-invalid={errors[name] ? 'true' : undefined}
         aria-describedby={errors[name] ? `${id(name)}-err` : undefined}
+        defaultValue={defaults[name]}
         {...props}
       />
       {errors[name] && <p className="field__error" id={`${id(name)}-err`}>{errors[name]}</p>}
@@ -84,7 +86,7 @@ export default function EnquiryForm({
       {fields.map(f => field(f.name, f.label, { type: 'text', inputMode: f.inputMode, autoComplete: 'off' }))}
       <div className="field">
         <label htmlFor={id('message')}>{messageLabel}</label>
-        <textarea id={id('message')} name="message" rows={4} />
+        <textarea id={id('message')} name="message" rows={4} defaultValue={defaults.message} />
       </div>
       <div className="btn-row">
         <button className="btn btn--primary" type="submit" disabled={busy}>{submitLabel}</button>

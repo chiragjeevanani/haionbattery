@@ -44,7 +44,7 @@ export default function AdminLayout() {
       <div className="admin-shell">
         <aside className={`admin-side${open ? ' open' : ''}`} aria-label="Admin menu">
           <Link className="admin-brand" to="/admin">
-            <img src="/logo.png" alt="Aexto" />
+            <img src="/logo-light.png" alt="Aexto" />
             <span>Admin</span>
           </Link>
           <nav className="admin-nav">

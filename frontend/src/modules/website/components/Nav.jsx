@@ -34,11 +34,11 @@ export default function Nav() {
   const current = path => (pathname === path || pathname.startsWith(`${path}/`) ? 'page' : undefined)
 
   return (
-    <header className={`nav${open ? ' is-open' : ''}`}>
+    <header className={`nav nav--split nav--tone${open ? ' is-open' : ''}`}>
       <div className="wrap nav__bar">
         <a className="skip-link" href="#top">Skip to content</a>
         <Link className="nav__logo" to="/" aria-label={`${settings.siteName}, home`}>
-          <img className="nav__logo-img" src="/logo.png" alt={settings.siteName} width="150" height="44" />
+          <img className="nav__logo-img" src="/logo-light.png" alt={settings.siteName} width="150" height="44" />
         </Link>
         <nav className="nav__links" aria-label="Main">
           <div className={`nav__item${expanded ? ' is-expanded' : ''}`}>

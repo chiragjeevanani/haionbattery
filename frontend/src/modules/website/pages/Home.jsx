@@ -4,34 +4,26 @@ import { useSite } from '../components/siteState.js'
 import useFetch from '../components/useFetch.js'
 import usePageMeta from '../components/usePageMeta.js'
 import ProductTile from '../components/ProductTile.jsx'
+import PackBuilder from '../components/PackBuilder.jsx'
+import MomentSection from '../components/MomentSection.jsx'
 import Arrow from '../components/Arrow.jsx'
 
-const COMPARE = [
-  ['Charge cycles', 'More', 'Fewer'],
-  ['Weight for the same range', 'Heavier', 'Lighter'],
-  ['Heat', 'Tolerates it well', 'Needs more care'],
-  ['Best for', 'E-rickshaws, loaders, storage', 'E-bikes, scooters'],
-]
-
+/** Full-bleed photograph, the words in a solid box on its calm side. */
 function Hero() {
   const { settings, whatsappUrl } = useSite()
   const { hero } = settings
   return (
-    <section className="hero hero--product" data-enter aria-labelledby="hero-h">
+    <section className="hero hero--photo" data-enter data-calm="left" aria-labelledby="hero-h">
+      <img className="hero__bg" src={hero.image} alt={hero.imageAlt} style={{ '--ly-pos': '50% 45%' }} fetchPriority="high" />
       <div className="wrap">
-        <div className="hero-text hero__in">
-          <div className="hero__head">
-            <div>
-              <h1 id="hero-h">{hero.headline}</h1>
-              <p className="hero__lead">{hero.lead}</p>
-            </div>
+        <div className="hero-text">
+          <div className="hero__text">
+            <h1 id="hero-h">{hero.headline}</h1>
+            <p className="hero__lead">{hero.lead}</p>
             <div className="btn-row">
               <Link className="btn btn--primary" to="/contact">Get a quote<Arrow /></Link>
               <a className="btn btn--secondary" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
             </div>
-          </div>
-          <div className="hero__stage">
-            <img src={hero.image} alt={hero.imageAlt} style={{ '--ly-pos': '50% 55%' }} fetchPriority="high" />
           </div>
         </div>
       </div>
@@ -39,38 +31,94 @@ function Hero() {
   )
 }
 
-/** Rows on the left, one photograph on the right that follows the row you point at. */
+function Designer() {
+  return (
+    <section className="section ground-surface" id="designer" aria-labelledby="designer-h">
+      <div className="wrap">
+        <div className="section-head">
+          <h2 id="designer-h">Design your pack. <span className="muted">See the cells it takes.</span></h2>
+        </div>
+        <PackBuilder />
+      </div>
+    </section>
+  )
+}
+
+/** Vehicle panels: the one you point at opens, the others narrow. */
 function Range({ products }) {
   const { categories } = useSite()
   const [active, setActive] = useState(0)
-  const shown = categories[active] || categories[0]
   if (!categories.length) return null
   const count = id => products.filter(p => p.categoryId === id).length
 
   return (
     <section className="section" id="range" aria-labelledby="range-h">
       <div className="wrap">
-        <div className="section-head">
-          <h2 id="range-h">Battery packs by vehicle. <span className="muted">Pick the one you drive.</span></h2>
+        <div className="section-head section-head--split">
+          <div><h2 id="range-h">Packs for every vehicle</h2></div>
+          <Link className="btn btn--secondary" to="/products">See all batteries</Link>
         </div>
-        <div className="grid grid--top fill">
-          <ul className="rows span-6">
-            {categories.map((c, i) => (
-              <li key={c.id} onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)}>
-                <Link className="rows__name" to={`/products?category=${c.slug}`} aria-current={i === active ? 'true' : undefined}>
-                  {c.name}{i === active ? <span className="range-dot" aria-hidden="true" /> : null}
-                </Link>
-                <p>{c.description}</p>
-                <span className="rows__value">{count(c.id)} {count(c.id) === 1 ? 'pack' : 'packs'}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="frame frame--photo frame--fill span-6 start-7">
-            {shown?.image && <img className="frame__img" key={shown.id} src={shown.image} alt={shown.name} />}
-          </div>
+        <div className="vpanels">
+          {categories.map((c, i) => (
+            <Link
+              key={c.id}
+              to={`/products?category=${c.slug}`}
+              className={`vpanel${i === active ? ' is-active' : ''}`}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+            >
+              <span className="vpanel__media">{c.image && <img src={c.image} alt="" loading="lazy" />}</span>
+              <span className="vpanel__body">
+                <span className="vpanel__num">{String(i + 1).padStart(2, '0')}</span>
+                <span className="vpanel__name">{c.name}</span>
+                <span className="vpanel__more">
+                  <span>{c.description}</span>
+                  <span className="vpanel__count">{count(c.id)} {count(c.id) === 1 ? 'pack' : 'packs'}</span>
+                </span>
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
+  )
+}
+
+/** One statement, set very large; its letters fly into the line as it rises (the kit's letters-assemble). */
+function Statement() {
+  const { settings } = useSite()
+  const s = settings.statement
+  return (
+    <MomentSection moment="letters-assemble" className="section" id="statement" aria-label="What we do">
+      <div className="wrap">
+        <h2 className="mo-la__type">{s.heading}</h2>
+        <p className="mo-la__sub">{s.text}</p>
+      </div>
+    </MomentSection>
+  )
+}
+
+/** The dark section: a red line climbs through the light ground above it (the kit's line-carries-colour). */
+function Process() {
+  const { settings } = useSite()
+  const { heading, steps } = settings.process
+  if (!steps?.length) return null
+  return (
+    <MomentSection moment="line-carries-colour" opts={{ from: 'base' }} className="section ground-inverse" id="process" aria-labelledby="process-h">
+      <div className="wrap">
+        <div className="section-head"><h2 id="process-h">{heading}</h2></div>
+        <ol className="steps grid">
+          {steps.map((s, i) => (
+            <li className="step span-4" key={i}>
+              <div className="step__media">{s.image && <img src={s.image} alt={s.imageAlt} loading="lazy" />}</div>
+              <p className="step__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </MomentSection>
   )
 }
 
@@ -86,91 +134,7 @@ function Popular({ products }) {
           <Link className="btn btn--secondary" to="/products">See all batteries</Link>
         </div>
         <div className="grid">
-          {list.map(p => (
-            <div key={p.id} className="span-3"><ProductTile product={p} ratio="3 / 4" /></div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Custom() {
-  const { settings } = useSite()
-  const c = settings.custom
-  return (
-    <section className="section" id="custom" aria-labelledby="custom-h">
-      <div className="wrap">
-        <div className="grid grid--top fill">
-          <div className="span-5">
-            <div className="section-head">
-              <h2 id="custom-h">{c.heading}</h2>
-              <p>{c.text}</p>
-            </div>
-            <ul className="rows">
-              <li><span className="rows__name">Voltage and capacity</span><span className="rows__value">12 V to 72 V</span></li>
-              <li><span className="rows__name">Peak current</span><span className="rows__value">Matched to your controller</span></li>
-              <li><span className="rows__name">Size and shape</span><span className="rows__value">Fits your tray</span></li>
-              <li><span className="rows__name">BMS and connectors</span><span className="rows__value">Your choice</span></li>
-            </ul>
-            <div className="btn-row"><Link className="btn btn--primary" to="/custom">Request a custom pack<Arrow /></Link></div>
-          </div>
-          <div className="frame frame--photo frame--fill span-6 start-7">
-            <img className="frame__img" src={c.image} alt={c.imageAlt} loading="lazy" />
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Storage() {
-  const { settings } = useSite()
-  const s = settings.storage
-  return (
-    <section className="section ground-inverse" id="storage" aria-labelledby="storage-h">
-      <div className="wrap">
-        <div className="section-head section-head--split">
-          <div>
-            <h2 id="storage-h">{s.heading}</h2>
-            <p>{s.text}</p>
-          </div>
-          <Link className="btn btn--secondary" to="/products?category=solar-inverter-batteries">See storage batteries</Link>
-        </div>
-        <div className="storage-frame frame frame--photo">
-          <img className="frame__img" src={s.image} alt={s.imageAlt} loading="lazy" />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Chemistry() {
-  const { categories } = useSite()
-  const rick = categories.find(c => c.slug === 'e-rickshaw-batteries')
-  return (
-    <section className="section" id="chemistry" aria-labelledby="chem-h">
-      <div className="wrap">
-        <div className="section-head">
-          <h2 id="chem-h">LiFePO4 or NMC. <span className="muted">Which one fits your vehicle.</span></h2>
-        </div>
-        <div className="grid grid--top fill">
-          <div className="span-7">
-            <table className="compare">
-              <thead><tr><th scope="col"><span className="sr-only">Property</span></th><th scope="col">LiFePO4</th><th scope="col">NMC</th></tr></thead>
-              <tbody>
-                {COMPARE.map(([label, a, b]) => (
-                  <tr key={label}><th scope="row">{label}</th><td>{a}</td><td>{b}</td></tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="btn-row"><Link className="btn btn--secondary" to="/contact">Ask which one fits</Link></div>
-          </div>
-          {rick?.image && (
-            <div className="frame frame--photo frame--fill span-4 start-9 chem-photo">
-              <img className="frame__img" src={rick.image} alt="A row of e-rickshaws parked in the shade" loading="lazy" />
-            </div>
-          )}
+          {list.map(p => <div key={p.id} className="span-3"><ProductTile product={p} /></div>)}
         </div>
       </div>
     </section>
@@ -181,10 +145,13 @@ function Faq() {
   const { faqs } = useSite()
   if (!faqs.length) return null
   return (
-    <section className="section" id="faq" aria-labelledby="faq-h">
-      <div className="wrap">
-        <div className="section-head"><h2 id="faq-h">Questions before you order</h2></div>
-        <div className="faq">
+    <section className="section ground-surface" id="faq" aria-labelledby="faq-h">
+      <div className="wrap grid">
+        <div className="span-5">
+          <div className="section-head"><h2 id="faq-h">Questions before you order</h2></div>
+          <div className="btn-row"><Link className="btn btn--secondary" to="/faqs">Read all questions</Link></div>
+        </div>
+        <div className="faq span-6 start-7">
           {faqs.slice(0, 5).map(f => (
             <div className="faq__item" key={f.id}><h3>{f.question}</h3><p>{f.answer}</p></div>
           ))}
@@ -202,11 +169,11 @@ export default function Home() {
   return (
     <main id="top">
       <Hero />
+      <Designer />
       <Range products={products} />
+      <Statement />
+      <Process />
       <Popular products={products} />
-      <Custom />
-      <Storage />
-      <Chemistry />
       <Faq />
     </main>
   )
