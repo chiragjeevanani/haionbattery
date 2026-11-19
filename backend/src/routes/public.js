@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { load, save } from '../db.js';
+import { all, col, getSettings } from '../db.js';
 import { uid, str } from '../utils.js';
 
 const router = Router();
@@ -11,24 +11,26 @@ const publicProduct = (p, categories) => ({
 });
 
 /** Everything the website shell needs in one request. */
-router.get('/site', (_req, res) => {
-  const db = load();
-  const activeProducts = db.products.filter(p => p.active);
+router.get('/site', async (_req, res) => {
+  const [settings, categories, brands, faqs, products] = await Promise.all([
+    getSettings(), all('categories'), all('brands'), all('faqs'), all('products', { active: true }),
+  ]);
+  const byOrder = (a, b) => a.sortOrder - b.sortOrder;
   res.json({
-    settings: db.settings,
-    categories: [...db.categories].sort((a, b) => a.sortOrder - b.sortOrder),
-    brands: [...db.brands].sort((a, b) => a.sortOrder - b.sortOrder),
-    faqs: [...db.faqs].sort((a, b) => a.sortOrder - b.sortOrder),
-    stats: { products: activeProducts.length, categories: db.categories.length },
+    settings,
+    categories: categories.sort(byOrder),
+    brands: brands.sort(byOrder),
+    faqs: faqs.sort(byOrder),
+    stats: { products: products.length, categories: categories.length },
   });
 });
 
-router.get('/products', (req, res) => {
-  const db = load();
+router.get('/products', async (req, res) => {
   const { category, q, featured, limit } = req.query;
-  let list = db.products.filter(p => p.active);
+  const [products, categories] = await Promise.all([all('products', { active: true }), all('categories')]);
+  let list = products;
   if (category) {
-    const cat = db.categories.find(c => c.slug === category);
+    const cat = categories.find(c => c.slug === category);
     list = cat ? list.filter(p => p.categoryId === cat.id) : [];
   }
   if (featured === '1' || featured === 'true') list = list.filter(p => p.featured);
@@ -39,24 +41,24 @@ router.get('/products', (req, res) => {
   list.sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
   const max = Number(limit);
   if (Number.isFinite(max) && max > 0) list = list.slice(0, max);
-  res.json(list.map(p => publicProduct(p, db.categories)));
+  res.json(list.map(p => publicProduct(p, categories)));
 });
 
-router.get('/products/:slug', (req, res) => {
-  const db = load();
-  const product = db.products.find(p => p.slug === req.params.slug && p.active);
+router.get('/products/:slug', async (req, res) => {
+  const [products, categories] = await Promise.all([all('products', { active: true }), all('categories')]);
+  const product = products.find(p => p.slug === req.params.slug);
   if (!product) return res.status(404).json({ error: 'Product not found.' });
-  const related = db.products
-    .filter(p => p.active && p.id !== product.id && p.categoryId === product.categoryId)
+  const related = products
+    .filter(p => p.id !== product.id && p.categoryId === product.categoryId)
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .slice(0, 3)
-    .map(p => publicProduct(p, db.categories));
-  res.json({ product: publicProduct(product, db.categories), related });
+    .map(p => publicProduct(p, categories));
+  res.json({ product: publicProduct(product, categories), related });
 });
 
 const enquiryLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 12, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests. Try again in a few minutes.' } });
 
-router.post('/enquiries', enquiryLimiter, (req, res) => {
+router.post('/enquiries', enquiryLimiter, async (req, res) => {
   const b = req.body || {};
   const name = str(b.name, 120);
   const phone = str(b.phone, 40);
@@ -69,8 +71,7 @@ router.post('/enquiries', enquiryLimiter, (req, res) => {
   if (phone && phone.replace(/\D/g, '').length < 7) errors.phone = 'Write a phone number with at least 7 digits.';
   if (Object.keys(errors).length) return res.status(400).json({ error: 'Check the highlighted fields.', fields: errors });
 
-  const db = load();
-  const enquiry = {
+  await col('enquiries').insertOne({
     id: uid(),
     type: ['quote', 'custom', 'contact'].includes(b.type) ? b.type : 'contact',
     name, phone, email, message,
@@ -81,9 +82,7 @@ router.post('/enquiries', enquiryLimiter, (req, res) => {
     status: 'new',
     notes: '',
     createdAt: new Date().toISOString(),
-  };
-  db.enquiries.unshift(enquiry);
-  save(db);
+  });
   res.status(201).json({ ok: true });
 });
 

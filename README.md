@@ -3,17 +3,16 @@
 Website and admin panel for Aexto, a maker of lithium battery packs for electric vehicles.
 
 - `frontend/` React + Vite. Website in `src/modules/website`, admin panel in `src/modules/admin`.
-- `backend/` Express API with a JSON file database, JWT admin sign-in and picture uploads.
+- `backend/` Express API on MongoDB, with JWT admin sign-in. Uploaded pictures are stored in the database too.
 
 ## Run it locally
 
 ```bash
 # terminal 1: API on :5000
 cd backend
-cp .env.example .env     # then edit JWT_SECRET and the admin password
+cp .env.example .env     # then set JWT_SECRET, the admin password and MONGODB_URI
 npm install
-npm run seed             # creates the starter data (run once)
-npm run dev
+npm run dev              # the first start fills an empty database with starter content
 
 # terminal 2: website on :5173
 cd frontend
@@ -31,10 +30,7 @@ the about page, questions, search text and social links.
 
 ## Deploy
 
-**API on Render.** New > Blueprint > choose this repo. `render.yaml` creates the `aexto-api` service.
-Read the generated `ADMIN_PASSWORD` in the service's Environment tab. The free plan wipes its disk on every
-deploy and restart (products, settings and uploads reset), so for real use switch to the Starter plan and
-enable the disk block in `render.yaml`.
+**API on Render.** New > Blueprint > choose this repo. `render.yaml` creates the `aexto-api` service. In its Environment tab set `MONGODB_URI` (your cluster's connection string) and `ADMIN_PASSWORD`. The service uses its own database, `aexto_website`, and fills it with starter content the first time it is empty. Data lives in MongoDB, so deploys and restarts never erase it. In MongoDB Atlas, Network Access must allow the host (for example 0.0.0.0/0).
 
 **Website on Vercel.** Import this repo, set **Root Directory** to `frontend`. `frontend/vercel.json` forwards
 `/api` and `/uploads` to the Render service. If Render gives the service a different address than

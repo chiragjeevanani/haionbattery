@@ -1,9 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'node:path';
-import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { load, save } from '../db.js';
+import { all, one, col, snapshot, getSettings, saveSettings } from '../db.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { uid, str, num, bool, strList, specList, uniqueSlug, digits } from '../utils.js';
 import { DEFAULT_SETTINGS } from '../defaults.js';
@@ -11,42 +8,47 @@ import { DEFAULT_SETTINGS } from '../defaults.js';
 const router = Router();
 router.use(requireAdmin);
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-// UPLOAD_DIR lets a host point uploaded pictures at a persistent disk.
-export const UPLOAD_DIR = process.env.UPLOAD_DIR ? path.resolve(process.env.UPLOAD_DIR) : path.resolve(here, '..', '..', 'uploads');
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-/* ------------------------------------------------------------ uploads */
+/* ------------------------------------------------------------ uploads (stored in the database) */
 const ALLOWED = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/avif': '.avif' };
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (_req, file, cb) => cb(null, `${Date.now()}-${uid().slice(0, 8)}${ALLOWED[file.mimetype] || '.bin'}`),
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 6 * 1024 * 1024, files: 10 },
   fileFilter: (_req, file, cb) => (ALLOWED[file.mimetype] ? cb(null, true) : cb(new Error('Upload a JPG, PNG, WebP or AVIF picture.'))),
 });
 
 router.post('/upload', (req, res) => {
-  upload.array('files', 10)(req, res, err => {
+  upload.array('files', 10)(req, res, async err => {
     if (err) return res.status(400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'Each picture must be 6 MB or smaller.' : err.message });
-    res.json({ urls: (req.files || []).map(f => `/uploads/${f.filename}`) });
+    try {
+      const urls = [];
+      for (const f of req.files || []) {
+        const name = `${Date.now()}-${uid().slice(0, 8)}${ALLOWED[f.mimetype]}`;
+        await col('uploads').insertOne({ name, contentType: f.mimetype, size: f.size, data: f.buffer, createdAt: new Date().toISOString() });
+        urls.push(`/uploads/${name}`);
+      }
+      res.json({ urls });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: 'The picture could not be saved. Try again.' });
+    }
   });
 });
 
 /* ------------------------------------------------------------ stats */
-router.get('/stats', (_req, res) => {
-  const db = load();
-  const s = db.settings;
+router.get('/stats', async (_req, res) => {
+  const [settings, products, activeProducts, categories, enquiries, newEnquiries, recent] = await Promise.all([
+    getSettings(),
+    col('products').countDocuments(),
+    col('products').countDocuments({ active: true }),
+    col('categories').countDocuments(),
+    col('enquiries').countDocuments(),
+    col('enquiries').countDocuments({ status: 'new' }),
+    col('enquiries').find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).limit(5).toArray(),
+  ]);
   res.json({
-    products: db.products.length,
-    activeProducts: db.products.filter(p => p.active).length,
-    categories: db.categories.length,
-    enquiries: db.enquiries.length,
-    newEnquiries: db.enquiries.filter(e => e.status === 'new').length,
-    recent: db.enquiries.slice(0, 5),
+    products, activeProducts, categories, enquiries, newEnquiries, recent,
     // The seeded placeholder is a country code followed by zeros; a real number never ends in seven zeros.
-    contactReady: digits(s.whatsappNumber).length >= 8 && !/0{7,}$/.test(digits(s.whatsappNumber)),
+    contactReady: digits(settings.whatsappNumber).length >= 8 && !/0{7,}$/.test(digits(settings.whatsappNumber)),
   });
 });
 
@@ -115,42 +117,35 @@ const cleanFaq = (b, db, existing) => {
 
 /** One CRUD router for each simple collection. */
 function crud(name, clean, { sort } = {}) {
-  router.get(`/${name}`, (_req, res) => {
-    const list = [...load()[name]];
+  router.get(`/${name}`, async (_req, res) => {
+    const list = await all(name);
     if (sort) list.sort(sort);
     res.json(list);
   });
-  router.get(`/${name}/:id`, (req, res) => {
-    const item = load()[name].find(x => x.id === req.params.id);
+  router.get(`/${name}/:id`, async (req, res) => {
+    const item = await one(name, { id: req.params.id });
     item ? res.json(item) : res.status(404).json({ error: 'Not found.' });
   });
-  router.post(`/${name}`, (req, res) => {
-    const db = load();
-    const out = clean(req.body || {}, db, null);
+  router.post(`/${name}`, async (req, res) => {
+    const out = clean(req.body || {}, await snapshot(), null);
     if (out.error) return res.status(400).json(out);
-    db[name].push(out.value);
-    save(db);
+    await col(name).insertOne({ ...out.value });
     res.status(201).json(out.value);
   });
-  router.put(`/${name}/:id`, (req, res) => {
-    const db = load();
-    const i = db[name].findIndex(x => x.id === req.params.id);
-    if (i < 0) return res.status(404).json({ error: 'Not found.' });
-    const out = clean(req.body || {}, db, db[name][i]);
+  router.put(`/${name}/:id`, async (req, res) => {
+    const existing = await one(name, { id: req.params.id });
+    if (!existing) return res.status(404).json({ error: 'Not found.' });
+    const out = clean(req.body || {}, await snapshot(), existing);
     if (out.error) return res.status(400).json(out);
-    db[name][i] = out.value;
-    save(db);
+    await col(name).replaceOne({ id: req.params.id }, { ...out.value });
     res.json(out.value);
   });
-  router.delete(`/${name}/:id`, (req, res) => {
-    const db = load();
-    if (name === 'categories' && db.products.some(p => p.categoryId === req.params.id)) {
+  router.delete(`/${name}/:id`, async (req, res) => {
+    if (name === 'categories' && (await col('products').countDocuments({ categoryId: req.params.id })) > 0) {
       return res.status(409).json({ error: 'This category still has products. Move or delete them first.' });
     }
-    const before = db[name].length;
-    db[name] = db[name].filter(x => x.id !== req.params.id);
-    if (db[name].length === before) return res.status(404).json({ error: 'Not found.' });
-    save(db);
+    const r = await col(name).deleteOne({ id: req.params.id });
+    if (!r.deletedCount) return res.status(404).json({ error: 'Not found.' });
     res.json({ ok: true });
   });
 }
@@ -166,11 +161,10 @@ const obj = (v) => (v && typeof v === 'object' ? v : {});
 const filled = (o, defaults) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, v || defaults[k]]));
 const block = (v, keys, caps = {}) => Object.fromEntries(keys.map(k => [k, str(obj(v)[k], caps[k] || 600)]));
 
-router.get('/settings', (_req, res) => res.json(load().settings));
+router.get('/settings', async (_req, res) => res.json(await getSettings()));
 
-router.put('/settings', (req, res) => {
+router.put('/settings', async (req, res) => {
   const b = obj(req.body);
-  const db = load();
   const fields = {};
   const whatsappNumber = digits(b.whatsappNumber);
   if (whatsappNumber && (whatsappNumber.length < 8 || whatsappNumber.length > 15)) {
@@ -181,7 +175,7 @@ router.put('/settings', (req, res) => {
   if (!str(b.siteName, 80)) fields.siteName = 'Write the business name.';
   if (Object.keys(fields).length) return res.status(400).json({ error: 'Check the highlighted fields.', fields });
 
-  db.settings = {
+  const settings = {
     siteName: str(b.siteName, 80),
     tagline: str(b.tagline, 120),
     phone: str(b.phone, 40),
@@ -207,29 +201,26 @@ router.put('/settings', (req, res) => {
     footerLede: str(b.footerLede, 200),
     seo: block(b.seo, ['title', 'description'], { title: 90, description: 200 }),
   };
-  save(db);
-  res.json(db.settings);
+  await saveSettings(settings);
+  res.json(await getSettings());
 });
 
 /* ------------------------------------------------------------ enquiries */
-router.get('/enquiries', (_req, res) => res.json(load().enquiries));
-
-router.patch('/enquiries/:id', (req, res) => {
-  const db = load();
-  const e = db.enquiries.find(x => x.id === req.params.id);
-  if (!e) return res.status(404).json({ error: 'Not found.' });
-  if (['new', 'contacted', 'closed'].includes(req.body?.status)) e.status = req.body.status;
-  if (typeof req.body?.notes === 'string') e.notes = str(req.body.notes, 2000);
-  save(db);
-  res.json(e);
+router.get('/enquiries', async (_req, res) => {
+  res.json(await col('enquiries').find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray());
 });
 
-router.delete('/enquiries/:id', (req, res) => {
-  const db = load();
-  const before = db.enquiries.length;
-  db.enquiries = db.enquiries.filter(x => x.id !== req.params.id);
-  if (db.enquiries.length === before) return res.status(404).json({ error: 'Not found.' });
-  save(db);
+router.patch('/enquiries/:id', async (req, res) => {
+  const change = {};
+  if (['new', 'contacted', 'closed'].includes(req.body?.status)) change.status = req.body.status;
+  if (typeof req.body?.notes === 'string') change.notes = str(req.body.notes, 2000);
+  const r = await col('enquiries').findOneAndUpdate({ id: req.params.id }, { $set: change }, { returnDocument: 'after', projection: { _id: 0 } });
+  r ? res.json(r) : res.status(404).json({ error: 'Not found.' });
+});
+
+router.delete('/enquiries/:id', async (req, res) => {
+  const r = await col('enquiries').deleteOne({ id: req.params.id });
+  if (!r.deletedCount) return res.status(404).json({ error: 'Not found.' });
   res.json({ ok: true });
 });
 
