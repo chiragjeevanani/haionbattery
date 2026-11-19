@@ -215,3 +215,8 @@ a.stat:hover { border-color: #b9b9b5; }
 .a-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--a-accent); }
 
 .admin .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Buttons keep their own text colour: the base ".admin button { color: inherit }" rule would otherwise make
+   red buttons dark and the delete buttons grey. */
+.admin .a-btn--primary, .admin a.a-btn--primary { color: var(--a-accent-ink); }
+.admin .a-btn--danger, .admin a.a-btn--danger { color: var(--a-error); }

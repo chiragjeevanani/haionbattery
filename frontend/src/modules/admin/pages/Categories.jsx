@@ -46,7 +46,7 @@ export default function Categories() {
 
       <div className="a-split">
         <div className="a-tablewrap">
-          <table className="a-table">
+          <table className="a-table" style={{ minWidth: 0 }}>
             <thead><tr><th>Category</th><th>Order</th><th><span className="sr-only">Actions</span></th></tr></thead>
             <tbody>
               {!list && <tr><td colSpan="3" className="a-empty">Loading</td></tr>}
