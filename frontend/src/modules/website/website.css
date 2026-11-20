@@ -1,7 +1,9 @@
 /* Page CSS for the Aexto website. The system (tokens, grid, buttons, nav, tiles, rows, forms)
    comes from /assets/system.css; only what is inside a visual and the kit lacks is written here. */
 
-.site-loading { min-height: 100svh; background: var(--bg); }
+.site-loading { min-height: 100svh; background: var(--bg); display: grid; place-items: center; padding: var(--s-6); }
+.site-loading__note { max-width: 420px; display: grid; gap: var(--s-3); }
+.site-loading__note h1 { font-size: var(--t-h3, 28px); }
 body.nav-locked { overflow: hidden; }
 
 /* The client's own logo: a transparent copy for light grounds, a reversed one for dark. */

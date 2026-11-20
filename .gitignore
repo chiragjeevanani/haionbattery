@@ -3,8 +3,6 @@ node_modules/
 dist/
 
 # secrets and local data: never commit these
-.env
-.env.*
 !.env.example
 backend/data/
 backend/uploads/
@@ -17,3 +15,4 @@ frontend/shots/
 .tmp-test/
 *.log
 .vercel/
+config.bat

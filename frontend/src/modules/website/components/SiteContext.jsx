@@ -6,14 +6,26 @@ const digits = v => String(v || '').replace(/\D/g, '')
 
 export function SiteProvider({ children }) {
   const [data, setData] = useState(null)
-  const [error, setError] = useState('')
+  const [waiting, setWaiting] = useState(false)
+  const [gaveUp, setGaveUp] = useState(false)
 
+  // The server sleeps when idle and takes up to a minute to wake. Keep trying quietly instead of showing an error.
   useEffect(() => {
     let live = true
-    api.get('/api/site')
-      .then(d => live && setData(d))
-      .catch(e => live && setError(e.message))
-    return () => { live = false }
+    let timer
+    const started = Date.now()
+    const attempt = () => {
+      api.get('/api/site')
+        .then(d => { if (live) setData(d) })
+        .catch(() => {
+          if (!live) return
+          setWaiting(true)
+          if (Date.now() - started > 120000) setGaveUp(true)
+          else timer = setTimeout(attempt, 3000)
+        })
+    }
+    attempt()
+    return () => { live = false; clearTimeout(timer) }
   }, [])
 
   const value = useMemo(() => {
@@ -36,18 +48,17 @@ export function SiteProvider({ children }) {
     }
   }, [data])
 
-  if (error) {
+  if (!value) {
     return (
-      <main className="section flow" id="top">
-        <div className="wrap">
-          <div className="section-head">
-            <h1>The site cannot load right now</h1>
-            <p>{error} Reload the page in a minute.</p>
+      <main className="site-loading" id="top" aria-busy={!gaveUp}>
+        {waiting && (
+          <div className="site-loading__note" role="status">
+            <h1>{gaveUp ? 'The site is not responding' : 'Waking the site up'}</h1>
+            <p>{gaveUp ? 'Please reload the page in a minute.' : 'This takes a few seconds the first time. The page will open by itself.'}</p>
           </div>
-        </div>
+        )}
       </main>
     )
   }
-  if (!value) return <div className="site-loading" aria-busy="true" />
   return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>
 }
